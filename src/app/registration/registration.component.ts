@@ -3,6 +3,8 @@ import { FormBuilder,FormGroup } from '@angular/forms';
 import{HttpClient} from'@angular/common/http'
 import { Router } from '@angular/router';
 import { Validators } from '@angular/forms';
+import { ServerService } from '../service/server.service';
+import { ErrorHandlerService } from '../shared/services/error-handler.service';
 
 
 @Component({
@@ -12,8 +14,9 @@ import { Validators } from '@angular/forms';
 })
 export class RegistrationComponent implements OnInit {
   registrationForm!:FormGroup
+  public errorMessage: string = '';
 
-  constructor(private formbuilder:FormBuilder, private http:HttpClient,private router:Router) { }
+  constructor(private formbuilder:FormBuilder, private http:HttpClient,private router:Router,private userdata:ServerService,private errorHandler:ErrorHandlerService ) { }
   ngOnInit(): void {
     this.registrationForm=this.formbuilder.group({
     username:['',[Validators.required,Validators.pattern('^[a-zA-Z0-9](_(?!(\.|_))|\.(?!(_|\.))|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]$')]],
@@ -39,13 +42,15 @@ export class RegistrationComponent implements OnInit {
    return this.registrationForm.get('password')
   }
   submit(){
-    this.http.post<any>("http://192.168.1.140:3000/students",this.registrationForm.value).subscribe((result)=>{
+    this.userdata.postdata(this.registrationForm.value).subscribe((result)=>{
       alert("Registration Successfull !!!");
       this.registrationForm.reset();
       this.router.navigate(['login'])
   
-     },err=>{
-       alert("somthing wrong in server side")
+     },(error) => {
+      this.errorHandler.handleError(error);
+      this.errorMessage = this.errorHandler.errorMessage;
+  
     })
   }
 }
