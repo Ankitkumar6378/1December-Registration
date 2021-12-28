@@ -30,7 +30,7 @@ export class ForgetPasswordComponent implements OnInit {
   }
  
   Submit(){
-    this.http.post<any>("http://192.168.1.140:3000/students",this.forgetpage.getRawValue()).subscribe((result)=>{
+    this.http.get<any>("http://192.168.1.140:3000/forget",this.forgetpage.getRawValue()).subscribe((result)=>{
       
     console.log("succesful")
     },err=>{
